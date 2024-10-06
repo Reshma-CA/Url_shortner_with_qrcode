@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener Home</title>
+    <link rel="stylesheet" href="{% static 'css/usercss/home.css' %}"> 
+</head>
+<body>
+    <a href="{% url 'logout' %}" class="logoutbutton" style="margin-right: 10px;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    <h1>Welcome home, {{ person_name }}</h1>  
+   
+
+    <!-- Create Shortened URL Form -->
+    <h2>Create a new shortened URL</h2>
+    <form id="shorten-url-form">
+        {% csrf_token %}
+        <label for="original_url">Enter URL:</label>
+        <input type="url" id="original_url" name="original_url" required>
+        <button type="submit">Shorten URL</button>
+    </form>
+
+    <!-- Placeholder to display shortened URL and QR code -->
+    <div id="result-container" style="display: none;">
+        <h2>Your Shortened URL is:</h2>
+        <center>   
+            <p><a id="short-url-link" href="{{ short_url }}"target="_blank">{{ short_url }}</a></p>
+            
+        </center>
+
+        <h2>Your QR code is:</h2>
+        <center>
+            <img id="qr-code-image" src="" alt="QR Code for shortened URL">
+        </center>
+    </div>
+
+    <center>
+        <button style="color: white; background-color: #900f74; width: 300px; height: 50px; border: none; border-radius: 5px; cursor: pointer;" 
+        onclick="fetchAllUrls()">Your all Shortened URLs</button>
+    </center>
+
+    
+
+    <script>
+        // Function to handle form submission
+        document.getElementById('shorten-url-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form from submitting normally
+
+            // Get the form data
+            const originalUrl = document.getElementById('original_url').value;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Send a POST request using fetch
+            fetch("{% url 'create_shortened_url' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    original_url: originalUrl
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    // Show the result container
+                    document.getElementById('result-container').style.display = 'block';
+
+                    // Set the shortened URL
+                    const shortUrlLink = document.getElementById('short-url-link');
+                    shortUrlLink.href = data.short_url; 
+
+                    shortUrlLink.innerText = data.short_url;
+
+                    // Set the QR code image
+                    document.getElementById('qr-code-image').src = data.qr_code_url;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Optionally: You can implement fetchAllUrls() if needed to load all shortened URLs.
+    </script>
+</body>
+</html>
