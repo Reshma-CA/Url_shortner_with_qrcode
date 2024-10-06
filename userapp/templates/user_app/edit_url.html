@@ -1,0 +1,81 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Shortened URL</title>
+    <link rel="stylesheet" href="{% static 'css/usercss/edit.css' %}">
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'logout' %}" class="btn btn-danger float-right">Logout</a>
+        
+        <h1>Welcome Home, {{ person_name }}</h1> 
+        
+        <center>
+            <a href="{% url 'home' %}" class="btn btn-outline-success">Back</a>
+        </center>
+       
+        <h2>Update Shortened URL</h2>
+        <form id="update-url-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="original_url">Enter New URL:</label>
+                <!-- Pre-fill the form field with the current original URL -->
+                <input type="url" id="original_url" name="original_url" class="form-control" value="{{ original_url }}" placeholder="Enter new URL" required>
+            </div>
+            <!-- Hidden field for URL ID -->
+            <input type="hidden" id="url_id" value="{{ url_id }}">
+            <button type="submit" class="btn btn-primary">Update URL</button>
+        </form>
+
+        <div id="result-container" style="display: none;" class="mt-4">
+            <h2>Your Updated Shortened URL:</h2>
+            <center>
+                <p><a id="short-url-link" href="{{ short_url }}" target="_blank">{{ short_url }}</a></p>
+            </center>
+
+            <h2>Your QR Code:</h2>
+            <center>
+                <img id="qr-code-image" src="" alt="QR Code for shortened URL">
+            </center>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('update-url-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+    
+            const originalUrl = document.getElementById('original_url').value;
+            const urlId = document.getElementById('url_id').value;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+            fetch(`/api/edit/${urlId}/`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    original_url: originalUrl
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById('result-container').style.display = 'block';
+                    const shortUrlLink = document.getElementById('short-url-link');
+                    shortUrlLink.href = data.short_url;
+                    shortUrlLink.innerText = data.short_url;
+                    document.getElementById('qr-code-image').src = data.qr_code_url;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

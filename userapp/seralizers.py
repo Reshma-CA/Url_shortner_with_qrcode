@@ -11,5 +11,5 @@ from userapp.models import Short_url
 class LinkSerializer(ModelSerializer):
     class Meta:
         model = Short_url
-        fields = ['original_url', 'short_code', 'short_url', 'qr_code_url', 'visit_count', 'created_at']
+        fields = ['id','original_url', 'short_code', 'short_url', 'qr_code_url', 'visit_count', 'created_at']
        

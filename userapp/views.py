@@ -17,13 +17,14 @@ import qrcode
 import os
 from django.conf import settings
 from .models import Short_url, People
-
+from rest_framework.views import APIView
 from .utils import generate_hash
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 
-# def home(request):
-#     return render(request, 'user_app/home.html') 
+# def index(request):
+#     return render(request, 'user_app/edit_url.html') 
 
 
 
@@ -82,18 +83,7 @@ def login(request):
 
     return render(request, 'user_app/login.html')
 
-@never_cache
-def home(request):
-    if 'email' in request.session:
-        email = request.session["email"]
-        try:
-            person = People.objects.get(email=email)
-            context = {"person_name": person.username,}
-            return render(request, 'user_app/home.html', context)
-        except People.DoesNotExist:
-            # Handle case where the user does not exist
-            return redirect('login')
-    return redirect('login')
+
 
 def logout(request):
     if 'username' in request.session:
@@ -148,8 +138,6 @@ def create_shortened_url(request):
 
     # Serialize the response
     serializer = LinkSerializer(short_url_instance)
-    
-   
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -172,3 +160,158 @@ def redirect_to_original_url(request, short_code):
     
 
 
+class View_Person_url_Details(APIView):
+    def get(self, request, *args, **kwargs):
+        # Get the email from session
+        email = request.session.get('email')
+
+        if not email:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            # Get the user based on the email
+            user = People.objects.get(email=email)
+        except People.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Get all short URLs for the user
+        urls = Short_url.objects.filter(user=user)
+        
+        if not urls.exists():
+            return Response({'message': 'No URLs found for this user'}, status=status.HTTP_200_OK)
+
+        # Serialize the queryset and return the data
+        serializer = LinkSerializer(urls, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+    # def put(self, request, *args, **kwargs):
+    #     # Get the email from session
+    #     email = request.session.get('email')
+    #     if not email:
+    #         return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+    #     try:
+    #         user = People.objects.get(email=email)
+    #     except People.DoesNotExist:
+    #         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    #     # Get the short URL by ID (passed in the request body)
+    #     url_id = request.data.get('id')
+    #     try:
+    #         short_url = Short_url.objects.get(id=url_id, user=user)
+    #     except Short_url.DoesNotExist:
+    #         return Response({'error': 'URL not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    #     # Update the URL fields
+    #     short_url.original_url = request.data.get('original_url', short_url.original_url)
+    #     short_url.save()
+
+    #     # Serialize the updated URL and return the response
+    #     serializer = LinkSerializer(short_url)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, *args, **kwargs):
+        # Get the email from session
+        email = request.session.get('email')
+        if not email:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        try:
+            user = People.objects.get(email=email)
+        except People.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Get the short URL by ID (passed in the request body)
+        url_id = request.data.get('id')
+        try:
+            short_url = Short_url.objects.get(id=url_id, user=user)
+        except Short_url.DoesNotExist:
+            return Response({'error': 'URL not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Delete the URL
+        short_url.delete()
+        return Response({'message': 'URL deleted successfully'}, status=status.HTTP_200_OK)
+    
+
+    def put(self, request, *args, **kwargs):
+        # Get the email from session
+        email = request.session.get('email')
+        if not email:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        try:
+            user = People.objects.get(email=email)
+        except People.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Get the short URL by ID (passed in the request body)
+        url_id = request.data.get('id')
+        try:
+            short_url = Short_url.objects.get(id=url_id, user=user)
+        except Short_url.DoesNotExist:
+            return Response({'error': 'URL not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Update the URL fields
+        short_url.original_url = request.data.get('original_url', short_url.original_url)
+        short_url.save()
+
+        # Serialize the updated URL and return the response
+        serializer = LinkSerializer(short_url)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class Edit_Person_url_Details(APIView):
+    def get(self, request, *args, **kwargs):
+        id = kwargs.get('id')  # Assuming the id is passed in the URL
+        obj = Short_url.objects.get(id=id)
+        serializer = LinkSerializer(obj)
+        context = {
+            'original_url': serializer.data['original_url'],  # Pass original URL
+            'url_id': id  # Pass the URL id for PUT request
+        }
+        return render(request, 'user_app/edit_url.html', context)
+        # return Response(serializer.data)
+    
+
+    def put(self, request, id):
+        # Fetch the URL by id, or return 404 if not found
+        short_url = get_object_or_404(Short_url, id=id)
+
+        # Pass the existing instance and new data to the serializer
+        serializer = LinkSerializer(short_url, data=request.data)
+
+        if serializer.is_valid():
+            # Automatically update the URL fields and save the object
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+def edit(request, id):
+    # Fetch the object based on the ID
+    shortened_url = get_object_or_404(Short_url, id=id)
+    
+    # Handle GET and POST logic
+    if request.method == 'POST':
+        # Handle the form submission, e.g., updating the URL
+        new_url = request.POST.get('new_url')
+        shortened_url.original_url = new_url
+        shortened_url.save()
+        return redirect('home')  # Redirect to home or another page after editing
+    
+    # Render the edit page with the shortened URL object
+    return render(request, 'user_app/edit_url.html', {'shortened_url': shortened_url}) 
+
+@never_cache
+def home(request):
+    if 'email' in request.session:
+        email = request.session["email"]
+        try:
+            person = People.objects.get(email=email)
+            context = {"person_name": person.username,}
+            return render(request, 'user_app/home.html', context)
+        except People.DoesNotExist:
+            # Handle case where the user does not exist
+            return redirect('login')
+    return redirect('login')

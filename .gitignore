@@ -13,11 +13,6 @@ __pycache__/
 *.egg-info/
 *.eggs/
 
-# Django
-db.sqlite3
-/media
-/staticfiles
-/static/
 
 # Logs
 *.log
