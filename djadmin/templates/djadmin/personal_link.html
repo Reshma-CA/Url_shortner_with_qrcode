@@ -24,11 +24,13 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Short URL:</h5>
-                        <a href="{{ url.short_url }}" target="_blank" class="url-link">{{ url.short_url }}</a>
+                        
                         <p class="card-text"><strong>Original URL:</strong> {{ url.original_url }}</p>
+                        <h5 class="card-title">Short URL:</h5>
+                        <a href="{{ url.short_url }}" target="_blank" class="url-link">{{ url.short_url }}</a><br>
+                        <img src="{{ url.qr_code_url }}" alt="QR Code" width="100" height="100">
                         <p class="card-text"><strong>Visit Count:</strong> {{ url.visit_count }}</p>
-                        <p class="card-text"><strong>Created At:</strong> {{ url.created_at }}</p>
+                        
                     </div>
                 </div>
             </div>

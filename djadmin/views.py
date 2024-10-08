@@ -64,15 +64,3 @@ class Personal_link_Admin(APIView):
             return Response({"error": "User not found."}, status=404)
     
 
-# class Personal_link_Admin(APIView):
-#     def get(self, request, id):
-#         try:
-#             user = People.objects.get(id=id)
-#             short_urls = Short_url.objects.filter(user=user)
-#             serializer = Url_LinkSerializer(short_urls, many=True)
-#             return Response(serializer.data)
-#         except People.DoesNotExist:
-#             return Response({"error": "User not found."}, status=404)
-
-# def Presonal_details(request, id):
-#     return render(request, 'djadmin/personal_link.html', {'id': id})
