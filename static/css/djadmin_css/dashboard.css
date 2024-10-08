@@ -1,0 +1,171 @@
+/* Reset margin and padding for all elements */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/* Ensure the body takes full height */
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Flex container to push footer to bottom */
+.body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Full viewport height */
+}
+
+/* Header styling */
+.header {
+    
+    background-color: white;
+    color: black;
+    text-align: center;
+    font-size: 10px;
+    padding: 20px;
+}
+
+/* Flex container for sidebar and content */
+.main-container {
+    display: flex;
+    flex: 1; /* Grow to take available space */
+    margin: 20px; /* Add margin around the container */
+}
+
+/* Main content area */
+.app_list_details {
+    flex: 1; /* Grow to take available space */
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0px 4px 6px rgba(23, 224, 20, 0.1); /* Subtle shadow */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    overflow-y: auto; /* Add scroll if needed */
+    margin-right: 20px; /* Space between content and sidebar */
+}
+
+/* Sidebar styling */
+.sidebar {
+    width: 150px;
+    background-color: #f8f9fa; /* Optional: light background for the sidebar */
+    padding: 10px; /* Add some padding */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional: shadow for better separation */
+    flex-shrink: 0; /* Prevent the sidebar from shrinking */
+}
+
+/* Sidebar buttons */
+.addprofile, .homebutton, .addpoints, .addtask, .logoutbutton {
+    background-color: white;
+    border: 2px solid #008CBA;
+    color: rgb(72, 10, 204);
+    padding: 15px;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 4px 2px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.addprofile {
+    border-color: #008CBA;
+}
+
+.homebutton {
+    background-color: rgb(78, 17, 220);
+    color: white;
+}
+
+.logoutbutton {
+    background-color: #ba34eb;
+    color: white;
+}
+
+/* Button icon spacing */
+.addprofile i, .homebutton i, .addpoints i, .addtask i, .logoutbutton i {
+    margin-right: 8px; /* Adjust space between icon and text */
+}
+
+/* Flex container for the item */
+.item {
+    width: 100%; /* Full width of the container */
+    max-width: 1200px; /* Optional: max width */
+    height: 250px; /* Less height */
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Image styling */
+.item img {
+    max-width: 150px; /* Adjust image size */
+    height: auto; /* Maintain aspect ratio */
+    margin-left: 20px; /* Add some space between text and image */
+    border-radius: 5px; /* Optional: rounded corners for the image */
+}
+
+/* Text and button styling */
+.item .details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align text items to the start (left) */
+    justify-content: center;
+    flex-grow: 1; /* Allow this section to grow */
+    margin-right: 20px; /* Space between text and image */
+}
+
+.item h2 {
+    font-size: 24px;
+    color: #f00a0a;
+    margin: 0 0 10px 0;
+}
+
+.item h3 {
+    font-size: 20px;
+    color: #3a0ecc;
+    margin: 0 0 10px 0;
+}
+.item h4 {
+    font-size: 18px;
+    color: #b00a6e;
+    margin: 0 0 10px 0;
+}
+
+
+.item a p {
+    font-size: 14px;
+    color: #007bff;
+    text-decoration: none;
+    margin: 5px 0;
+}
+
+.item button {
+    background-color: #04AA6D;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* Footer styling */
+.footer {
+    background-color: black;
+    color: white;
+    padding: 10px 0; /* Add padding for spacing */
+    text-align: center;
+    position: relative;
+}

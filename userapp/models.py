@@ -8,6 +8,7 @@ class People(models.Model):
     email=models.CharField(max_length=200)
     password=models.CharField(max_length=200)
     confirm_password =models.CharField(max_length=200)
+    Number_of_shorterned_links = models.IntegerField(default=0)
 
     def __str__(self):
         return self.username
@@ -21,7 +22,7 @@ class Short_url(models.Model):
     qr_code_url = models.ImageField(upload_to='qr_codes/',blank=True, null=True)
     visit_count = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    
     def __str__(self):
         return f'{self.original_url} -> {self.short_url}'
     

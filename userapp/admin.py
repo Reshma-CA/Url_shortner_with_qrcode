@@ -5,7 +5,7 @@ from userapp.models import *
 
 
 class PeopleAdmin(admin.ModelAdmin):
-    list_display=("username","email","password","confirm_password")
+    list_display=("username","email","Number_of_shorterned_links","password","confirm_password")
 
 class Url_linkAdmin(admin.ModelAdmin):
     list_display=("user","original_url","short_code","short_url","qr_code_url","visit_count","created_at")

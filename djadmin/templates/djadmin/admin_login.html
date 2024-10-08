@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="{% static 'css/djadmin_css/admin_login.css' %}"> 
+</head>
+<body>
+    <div class="login-container">
+        <h1>Admin Login</h1>
+        <form action="{% url 'admin_login' %}" method="post">
+            {% csrf_token %}
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" >
+            <span id="username-error" class="error-message"></span>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" >
+            <span id="password-error" class="error-message"></span>
+
+            <button type="submit">Login</button>
+        </form>
+        {% if messages %}
+        <div class="message-container">
+            {% for message in messages %}
+                <div class="error-message">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <div class="button-container">
+            
+        <a href="{% url 'welcome' %}" class="btn">back to home</a>
+    </div>
+    </div>
+
+    <!-- Link to the external JavaScript file -->
+    <script >
+        
+    </script>  
+</body>
+</html>

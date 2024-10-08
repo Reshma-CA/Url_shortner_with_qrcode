@@ -21,12 +21,18 @@ from rest_framework.views import APIView
 from .utils import generate_hash
 from django.shortcuts import get_object_or_404
 
+
+from django.http import JsonResponse
+import logging
+
+logger = logging.getLogger(__name__)
 # Create your views here.
 
 # def index(request):
 #     return render(request, 'user_app/edit_url.html') 
 
-
+def Welcome_page(request):
+    return render(request, 'user_app/index.html')  
 
 @api_view(['GET'])
 def get_links(request):
@@ -135,7 +141,10 @@ def create_shortened_url(request):
         qr_code_url=f'qr_codes/{short_code}.png',
         created_at=timezone.now()
     )
-
+    
+    # Increment the number of shortened links for the user
+    user.Number_of_shorterned_links += 1  # Increment the counter
+    user.save()  # Save the updated user instance
     # Serialize the response
     serializer = LinkSerializer(short_url_instance)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -206,21 +215,58 @@ class Edit_Person_url_Details(APIView):
         if serializer.is_valid():
             serializer.save()  # Save the updated URL
 
-            # Generate the response with the updated short URL and QR code path
+            # Generate the response with the updated short URL and QR code URL
             response_data = {
                 'original_url': serializer.data['original_url'],
                 'short_code': short_url_obj.short_code,  # Make sure this is updated
                 'short_url': short_url_obj.short_url,    # Return the updated short URL
-                'qr_code': short_url_obj.qr_code.url if short_url_obj.qr_code else None  # Updated QR code path
+                'qr_code_url': short_url_obj.qr_code_url.url if short_url_obj.qr_code_url else None  # Use qr_code_url
             }
 
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
     def delete(self, request, id):
         short_url = get_object_or_404(Short_url, id=id)
         short_url.delete()
         return Response({"message": "URL deleted successfully!"}, status=status.HTTP_204_NO_CONTENT)
+
+    # Debugging
+    # def put(self, request, id, *args, **kwargs):
+    #     try:
+    #         # Get the URL object by ID
+    #         short_url_obj = get_object_or_404(Short_url, id=id)
+            
+    #         # Log the request data
+    #         logger.info(f"Received PUT request with data: {request.data}")
+
+    #         # Update the object with new data
+    #         serializer = LinkSerializer(short_url_obj, data=request.data, partial=True)
+
+    #         if serializer.is_valid():
+    #             serializer.save()
+
+    #             # Generate the response with the updated short URL and QR code path
+    #             response_data = {
+    #                 'original_url': serializer.data['original_url'],
+    #                 'short_url': short_url_obj.short_url,    # Updated short URL
+    #                 'qr_code': short_url_obj.qr_code.url if short_url_obj.qr_code else None  # QR code path
+    #             }
+
+    #             logger.info(f"Successfully updated URL: {response_data}")
+    #             return Response(response_data, status=status.HTTP_200_OK)
+            
+    #         # Log any validation errors
+    #         logger.error(f"Validation failed: {serializer.errors}")
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    #     except Exception as e:
+    #         # Log the exception for debugging
+    #         logger.error(f"Error occurred while updating URL: {str(e)}")
+    #         return JsonResponse({'error': 'Internal Server Error', 'details': str(e)}, status=500)
+    
+
+    
 
    
         

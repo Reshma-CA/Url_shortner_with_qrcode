@@ -1,0 +1,44 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Links for {{ user.username }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/djadmin_css/personal_link.css' %}"> 
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Personal Links for {{ user.username }}</h1>
+            <h2>Email: {{ user.email }}</h2>
+            <h3>Total Short Links: {{ short_urls|length }}</h3>
+        </div>
+
+        <div class="row">
+            {% for url in short_urls %}
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Short URL:</h5>
+                        <a href="{{ url.short_url }}" target="_blank" class="url-link">{{ url.short_url }}</a>
+                        <p class="card-text"><strong>Original URL:</strong> {{ url.original_url }}</p>
+                        <p class="card-text"><strong>Visit Count:</strong> {{ url.visit_count }}</p>
+                        <p class="card-text"><strong>Created At:</strong> {{ url.created_at }}</p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-md-12 no-links">
+                <p>No shortened URLs found for this user.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+
+</html>

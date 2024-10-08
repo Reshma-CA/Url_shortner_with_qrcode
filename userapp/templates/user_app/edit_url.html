@@ -36,63 +36,62 @@
             <center>
                 <p><a id="short-url-link" href="{{ short_url }}" target="_blank">{{ short_url }}</a></p>
             </center>
-
+        
             <h2>Your QR Code:</h2>
             <center>
-                <img id="qr-code-image" src="" alt="QR Code for shortened URL">
+                <img id="qr-code-image" src="{{ qr_code_url }}" alt="QR Code for shortened URL">
             </center>
         </div>
+        
     </div>
 
     <script>
         document.getElementById('update-url-form').addEventListener('submit', function (event) {
             event.preventDefault();
         
-            // Get the URL ID and new original URL from the form
-            const urlId = document.getElementById('url_id').value;
-            const newOriginalUrl = document.getElementById('original_url').value;
+            const urlId = document.getElementById('url_id').value;  // ID of the URL to be updated
+            const newOriginalUrl = document.getElementById('original_url').value;  // New original URL
         
-            // First, make an AJAX PUT request to update the shortened URL
             fetch(`/api/edit/${urlId}/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
+                    'X-CSRFToken': '{{ csrf_token }}'  // Pass the CSRF token for security
                 },
                 body: JSON.stringify({
-                    original_url: newOriginalUrl
+                    original_url: newOriginalUrl  // Pass the updated original URL to the server
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                // Check if the response is OK (status code 200)
+                if (!response.ok) {
+                    throw new Error(`Request failed with status ${response.status}`);
+                }
+                return response.json();  // Convert the response to JSON
+            })
             .then(data => {
-                if (data.original_url) {
-                    // PUT request was successful, now fetch the updated data via GET request
-                    fetch(`/api/edit/${urlId}/`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(updatedData => {
-                        // Now display the updated data (short URL and QR code)
-                        document.getElementById('result-container').style.display = 'block';
-                        document.getElementById('short-url-link').href = updatedData.short_url;
-                        document.getElementById('short-url-link').textContent = updatedData.short_url;
-                        document.getElementById('qr-code-image').src = updatedData.qr_code;
-                    })
-                    .catch(error => {
-                        console.error('Error fetching updated data:', error);
-                    });
+                console.log('Response Data:', data);  // Debugging: log the response data to the console
+        
+                // Check if the short_url and qr_code_url fields exist in the response
+                if (data.short_url && data.qr_code_url) {
+                    // Update the short URL link and the QR code image
+                    document.getElementById('short-url-link').textContent = data.short_url;
+                    document.getElementById('short-url-link').href = data.short_url;
+                    document.getElementById('qr-code-image').src = data.qr_code_url;
+        
+                    // Show the result container with the updated information
+                    document.getElementById('result-container').style.display = 'block';
                 } else {
-                    alert('Error updating URL: ' + JSON.stringify(data));
+                    alert('Error: short_url or qr_code_url missing from the response.');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error in Fetch:', error);  // Log any error to the console
+                alert('An error occurred: ' + error.message);
             });
         });
         
     </script>
+    
 </body>
 </html>
