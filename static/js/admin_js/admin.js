@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    fetch('http://127.0.0.1:8000/djadmin/api/profiles/')
+    fetch('http://54.252.28.90/djadmin/api/profiles/')
     .then(response => response.json())
     .then(data => {
         console.log('Fetched data:', data);  // Log the data to the console

@@ -120,7 +120,7 @@ def create_shortened_url(request):
     # Generate a unique short code
     short_code = generate_hash()
 
-    short_url = f"http://127.0.0.1:8000/{short_code}"  # Build the full short URL
+    short_url = f"http://54.252.28.90/{short_code}"  # Build the full short URL
 
     # Ensure the 'qr_codes/' directory exists within the media directory
     qr_code_dir = os.path.join(settings.MEDIA_ROOT, 'qr_codes')
